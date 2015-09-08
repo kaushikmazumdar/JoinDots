@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -13,15 +14,17 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 
 public class JoinDots extends ApplicationAdapter implements InputProcessor{
 	SpriteBatch batch;
-	ShapeRenderer shapeRenderer;
 	Pixmap pixmap;
 	Texture texture;
 	Sprite sprite;
+	OrthographicCamera camera;
 
 	int iDragX, iDragY;
 	int iTouchX, iTouchY;
 	int iTouchUpX, iTouchUpY;
 	int iPrevDragX, iPrevDragY;
+	int iWidth, iHeight;
+	int iAlphabetLine[];
 
 	boolean bTouchUp=false;
 	boolean bTouchDown=false;
@@ -30,18 +33,17 @@ public class JoinDots extends ApplicationAdapter implements InputProcessor{
 	public void create () {
 		Gdx.graphics.setContinuousRendering(false);
 
+		iWidth = Gdx.graphics.getWidth();
+		iHeight = Gdx.graphics.getHeight();
+		camera = new OrthographicCamera();
+		camera.setToOrtho(false,iWidth,iHeight);
+
 		batch = new SpriteBatch();
-		shapeRenderer = new ShapeRenderer();
 
 		pixmap = new Pixmap(Gdx.graphics.getWidth(),Gdx.graphics.getHeight(), Pixmap.Format.RGBA8888);
-		//pixmap.setColor(Color.WHITE);
-		//pixmap.fill();
-		//pixmap.drawCircle(pixmap.getWidth() / 2, pixmap.getHeight() / 2, pixmap.getHeight() / 2 - 1);
-		//pixmap.drawCircle(iDragX,iDragY,20);
 		pixmap.setColor(Color.RED);
 		pixmap.fillCircle(30,30, 5);
 		pixmap.fillCircle(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, 5);
-		//pixmap.drawCircle(100,100,20);
 
 		texture = new Texture(pixmap);
 		//sprite = new Sprite(texture);
@@ -50,6 +52,7 @@ public class JoinDots extends ApplicationAdapter implements InputProcessor{
 		iTouchX = iTouchY=0;
 		iTouchUpX = iTouchUpY=0;
 		iPrevDragX = iPrevDragY =0;
+		//iAlphabetLine = new Integer[5];
 
 		Gdx.input.setInputProcessor(this);
 
@@ -61,22 +64,6 @@ public class JoinDots extends ApplicationAdapter implements InputProcessor{
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		batch.begin();
-		//batch.draw(img, 0, 0);
-
-
-
-		//sprite.setPosition(100,100);
-		//sprite.draw(batch);
-
-
-
-		//shapeRenderer.begin(ShapeRenderer.ShapeType.Filled);
-		//shapeRenderer.setColor(Color.YELLOW);
-		//shapeRenderer.rect(0,0,100,100);
-		//shapeRenderer.circle(10,10,20);
-		//shapeRenderer.rectLine(iTouchX,iTouchY,iDragX,iDragY,10);
-		//shapeRenderer.circle(150,150,20);
-		//shapeRenderer.end();
 
 		if(bTouchUp) {
 			pixmap.setColor(Color.YELLOW);
@@ -88,16 +75,18 @@ public class JoinDots extends ApplicationAdapter implements InputProcessor{
 			pixmap.setColor(Color.BLUE);
 
 			if(bTouchDown==false) {
+
 				pixmap.drawLine(iPrevDragX, iPrevDragY, iDragX, iDragY);
-				//pixmap.drawLine(iTouchX,iTouchY,iDragX,iDragY); remember magic
+				iPrevDragX = iDragX;
+				iPrevDragY = iDragY;
+
+				// this is where magic happened
+				//pixmap.drawLine(iTouchX,iTouchY,iDragX,iDragY);
 				texture.draw(pixmap, 0, 0);
 			}
 		}
 
 		batch.draw(texture,0,0);
-
-
-
 
 		batch.end();
 	}
@@ -141,21 +130,17 @@ public class JoinDots extends ApplicationAdapter implements InputProcessor{
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
 
-		if(bTouchDown==false) {
-			iPrevDragX = iDragX;
-			iPrevDragY = iDragY;
-		}
-		else
+//		if(bTouchDown==false) {
+//			iPrevDragX = iDragX;
+//			iPrevDragY = iDragY;
+//		}
+//		else
 			bTouchDown = false;
 
 		iDragX=screenX;
 		iDragY=screenY;
 
 		System.out.println("x|y : " + screenX + "," + screenY);
-		//pixmap.setColor(Color.RED);
-		//pixmap.fillCircle(screenX, screenY, 5);
-		//texture.draw(pixmap, 0, 0);
-
 		return true;
 	}
 
